@@ -1,7 +1,8 @@
 #include<Keyboard.h>
 #include<EEPROM.h> // do paměti ukládá poslední pozici světla
+
 const int tl5 = 8; // píše " ", nemá světlo
-const int tl4 = 7; // píše "w", nemá světlo
+const int tl4 = 7; // slouží ke změně světelných módů, nemá světlo
 const int tl3 = 4; // píše "e", nemá světlo
 const int tl2 = 3; // píše "r", světlo na pin "led1" (5)
 const int tl1 = 2; // píše "t", světlo na pin "led2" (6)
