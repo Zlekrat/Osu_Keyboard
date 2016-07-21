@@ -1,16 +1,16 @@
 #include<Keyboard.h>
-#include<EEPROM.h>
-const int tl5 = 8; //píše " ", nemá světlo
-const int tl4 = 7; //píše "w", nemá světlo
-const int tl3 = 4; //píše "e", nemá světlo
-const int tl2 = 3; //píše "r", světlo na pin "led1" (5)
-const int tl1 = 2; //píše "t", světlo na pin "led2" (6)
-const int led1 = 5; //světlo k pinu 3
-const int led2 = 6; //světlo k pinu 2
+#include<EEPROM.h> // do paměti ukládá poslední pozici světla
+const int tl5 = 8; // píše " ", nemá světlo
+const int tl4 = 7; // píše "w", nemá světlo
+const int tl3 = 4; // píše "e", nemá světlo
+const int tl2 = 3; // píše "r", světlo na pin "led1" (5)
+const int tl1 = 2; // píše "t", světlo na pin "led2" (6)
+const int led1 = 5; // světlo k pinu 3
+const int led2 = 6; // světlo k pinu 2
 int svetlo1 = 0; 
 int svetlo2 = 0;
-int stupnovani = 1;
-int adresa = 1; //pamatuje si naposledy použitou pozici světel
+int stupnovani = 1; // rychlost postupného zhsínání světla ve světelném módu 1
+int adresa = 1; // pamatuje si naposledy použitou pozici světel
 int nastaveni = 1;
 
 void rozhodnuti_svetla()
@@ -18,19 +18,21 @@ void rozhodnuti_svetla()
   switch(nastaveni)
   {
     case 1:
-    svetlo_a(); break; 
+    svetlo_a(); break; // světelný mód 1
     case 2: 
-    svetlo_b(); break; 
+    svetlo_b(); break; // světelný mód 2
     case 3:
-    svetlo_c(); break;
+    svetlo_c(); break; // světelný mód 3
     case 4:
-    svetlo_d(); break;
+    svetlo_d(); break; // světelný mód 4
   }
 }
 
-//svetlo_a = breathing mód
+// světelný mód 1 = reakce na zmáčknutí klávesy rozsvícením a následným stmavením světla
+// svetlo_a = reakční mód
 void svetlo_a()
 {
+  // pokud je klávesa stisklá, svítí, pokud ne, postupně snižuje světelnou hodnotu
   if (digitalRead(tl2) == 0) 
   {
       svetlo1 = 255;
@@ -59,13 +61,15 @@ void svetlo_a()
   }
 }
 
-//svetlo_b = beze světla
+// světelný mód 2 = beze světla
+// svetlo_b = beze světla
 void svetlo_b()
 {
-  //beze světla
+  // beze světla
 }
 
-//svetlo_c = svítí při stisku tlačítka
+// světelný mód 3 = pokud je tlačítko stisklé, svítí, pokud ne, nesvítí
+// svetlo_c = svítí při stisku tlačítka
 void svetlo_c()
 {
   if (digitalRead(tl2) == 0) 
@@ -90,7 +94,8 @@ void svetlo_c()
   } 
 }
 
-//svetlo_d = svítí pořád
+// světelný mód 4 = světlo je pořád zapnuté
+// svetlo_d = svítí pořád
 void svetlo_d()
 {
   analogWrite(led1, 255);
@@ -99,34 +104,38 @@ void svetlo_d()
     
 void setup()
 {
-  //pokud nastane problém s pamětí, program ji resetuje
+  // pokud nastane problém s pamětí, program ji resetuje
   nastaveni = EEPROM.read(adresa);
   if (nastaveni == 0)
   {
       EEPROM.write(adresa, 1);
       nastaveni = EEPROM.read(adresa);
   }
-  
+
+  // nastavení tlačítek jako vstupů
   pinMode(tl1, INPUT);
   pinMode(tl2, INPUT); 
   pinMode(tl3, INPUT);
   pinMode(tl4, INPUT); 
   pinMode(tl5, INPUT); 
-  
+
+  // nastavení led světel jako výstupů
   pinMode(led1, OUTPUT);           
   pinMode(led2, OUTPUT);
-    
+
+  // tlačítka jsou inicializována
   digitalWrite(tl1, HIGH);
   digitalWrite(tl2, HIGH);
   digitalWrite(tl3, HIGH);
   digitalWrite(tl4, HIGH);
   digitalWrite(tl5, HIGH);
+
+  // zahajujeme knihovnu s funkcemi klávesnice
   Keyboard.begin();
 }
 
 void loop()
 {
-
   
   if (digitalRead(tl5) == 0) 
   {
@@ -137,7 +146,7 @@ void loop()
     Keyboard.release(32);   
   }
 
-  //boční tlačítko pro změnu nastavení
+  // boční tlačítko slouží pro změnu nastavení
   if (digitalRead(tl4) == 0) 
   {
     if (digitalRead(tl3) == 0)
@@ -155,7 +164,7 @@ void loop()
   }
   else              
   {
-    //nedělá nic 
+    // nedělá nic 
   }
   
   if (digitalRead(tl3) == 0) 
