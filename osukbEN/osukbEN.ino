@@ -1,16 +1,17 @@
 #include<Keyboard.h>
-#include<EEPROM.h>
-const int tl5 = 8; //píše " ", nemá světlo
-const int tl4 = 7; //píše "w", nemá světlo
-const int tl3 = 4; //píše "e", nemá světlo
-const int tl2 = 3; //píše "r", světlo na pin "led1" (5)
-const int tl1 = 2; //píše "t", světlo na pin "led2" (6)
-const int led1 = 5; //světlo k pinu 3
-const int led2 = 6; //světlo k pinu 2
+#include<EEPROM.h> // this is for saving last light mode into memory (when you unplug or reset)
+
+const int tl5 = 8; // writes " ", no light
+const int tl4 = 7; // used to change between light modes, no light
+const int tl3 = 4; // writes "e", no light
+const int tl2 = 3; // writes "r", light on pin "led1" (5)
+const int tl1 = 2; // writes "t", light on pin "led2" (6)
+const int led1 = 5; // light for pin 3
+const int led2 = 6; // light for pin 2
 int svetlo1 = 0; 
 int svetlo2 = 0;
-int stupnovani = 1;
-int adresa = 1; //pamatuje si naposledy použitou pozici světel
+int stupnovani = 1; // change speed of turning light off in light mode 1
+int adresa = 1; // remembers last light mode
 int nastaveni = 1;
 
 void rozhodnuti_svetla()
@@ -18,17 +19,17 @@ void rozhodnuti_svetla()
   switch(nastaveni)
   {
     case 1:
-    svetlo_a(); break; 
+    svetlo_a(); break; // light mode 1
     case 2: 
-    svetlo_b(); break; 
+    svetlo_b(); break; // light mode 2
     case 3:
-    svetlo_c(); break;
+    svetlo_c(); break; // light mode 3
     case 4:
-    svetlo_d(); break;
+    svetlo_d(); break; // light mode 4
   }
 }
 
-//svetlo_a = breathing mód
+// light mode 1 = when the button is pressed, led lights up, when it is not, light slowly goes dark
 void svetlo_a()
 {
   if (digitalRead(tl2) == 0) 
@@ -59,13 +60,13 @@ void svetlo_a()
   }
 }
 
-//svetlo_b = beze světla
+// light mode 2 = no light
 void svetlo_b()
 {
-  //beze světla
+  // no light
 }
 
-//svetlo_c = svítí při stisku tlačítka
+// light mode 3 = light is on when pressed, when not pressed it's off
 void svetlo_c()
 {
   if (digitalRead(tl2) == 0) 
@@ -90,7 +91,7 @@ void svetlo_c()
   } 
 }
 
-//svetlo_d = svítí pořád
+// light mode 4 = light is allways on
 void svetlo_d()
 {
   analogWrite(led1, 255);
@@ -99,34 +100,38 @@ void svetlo_d()
     
 void setup()
 {
-  //pokud nastane problém s pamětí, program ji resetuje
+  // in case of memory fail, memory is reset 
   nastaveni = EEPROM.read(adresa);
   if (nastaveni == 0)
   {
       EEPROM.write(adresa, 1);
       nastaveni = EEPROM.read(adresa);
   }
-  
+
+  // setting button pins as inputs
   pinMode(tl1, INPUT);
   pinMode(tl2, INPUT); 
   pinMode(tl3, INPUT);
   pinMode(tl4, INPUT); 
   pinMode(tl5, INPUT); 
-  
+
+  // setting led pins as outputs
   pinMode(led1, OUTPUT);           
   pinMode(led2, OUTPUT);
-    
+
+  // inicializing button pins
   digitalWrite(tl1, HIGH);
   digitalWrite(tl2, HIGH);
   digitalWrite(tl3, HIGH);
   digitalWrite(tl4, HIGH);
   digitalWrite(tl5, HIGH);
+
+  // starting keyboard library
   Keyboard.begin();
 }
 
 void loop()
 {
-
   
   if (digitalRead(tl5) == 0) 
   {
@@ -137,7 +142,7 @@ void loop()
     Keyboard.release(32);   
   }
 
-  //boční tlačítko pro změnu nastavení
+  // side button is used to change light modes
   if (digitalRead(tl4) == 0) 
   {
     if (digitalRead(tl3) == 0)
@@ -155,7 +160,7 @@ void loop()
   }
   else              
   {
-    //nedělá nic 
+    // nedělá nic 
   }
   
   if (digitalRead(tl3) == 0) 
